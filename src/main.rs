@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::Read;
+use std::io::{self, Read};
 
 enum Instr {
     IncPtr, // '>'
@@ -32,11 +32,11 @@ fn parser(src: &str) -> Vec<Instr> {
 }
 
 fn runner(prog: &[Instr]) {
-    let mut pc = 0;
     let mut data: [u8; 1024] = [0; 1024];
     let mut dataptr = 0;
-    let mut inp: [u8; 1] = [0; 1];
+    let mut pc = 0;
 
+    let mut inp: [u8; 1] = [0; 1];
     while pc < prog.len() {
         match prog[pc] {
             Instr::IncPtr => dataptr += 1,
@@ -45,9 +45,7 @@ fn runner(prog: &[Instr]) {
             Instr::Dec => data[dataptr] -= 1,
             Instr::Output => print!("{}", data[dataptr] as char),
             Instr::Input => {
-                std::io::stdin()
-                    .read_exact(&mut inp)
-                    .expect("failed to read");
+                io::stdin().read_exact(&mut inp).expect("failed to read");
                 data[dataptr] = inp[0];
             }
             Instr::Jnz(addr) => {
@@ -68,6 +66,6 @@ fn main() {
         file.read_to_string(&mut src).expect("failed to read");
         runner(&parser(&src));
     } else {
-        println!("usage: brainfuck-plus <file.bf>");
+        println!("usage: brainfuck <file.bf>");
     }
 }
