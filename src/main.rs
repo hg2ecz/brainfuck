@@ -8,11 +8,11 @@ enum Instr {
     Dec,    // '-'
     Output, // '.' u8 to ascii
     Input,  // ',' ascii to u8
-    // '[' LoopBegin --> Vec::push()
+    //  LoopBegin '[' --> push(POSITION)
     Jnz(usize), // ']' Jump if not zero
 }
 
-fn parser(src: &str) -> Vec<Instr> {
+fn compiler(src: &str) -> Vec<Instr> {
     let mut prog = vec![];
     let mut loop_start = vec![];
     for ch in src.chars() {
@@ -31,7 +31,7 @@ fn parser(src: &str) -> Vec<Instr> {
     prog
 }
 
-fn runner(prog: &[Instr]) {
+fn vcpu_runner(prog: &[Instr]) {
     let mut data: [u8; 1024] = [0; 1024];
     let mut dataptr = 0;
     let mut pc = 0;
@@ -64,7 +64,7 @@ fn main() {
         let mut file = File::open(fname).expect("program file not found");
         let mut src = String::new();
         file.read_to_string(&mut src).expect("failed to read");
-        runner(&parser(&src));
+        vcpu_runner(&compiler(&src));
     } else {
         println!("usage: brainfuck <file.bf>");
     }
